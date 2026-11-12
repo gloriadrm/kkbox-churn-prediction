@@ -1,16 +1,14 @@
 # KKBox Churn Prediction
 
 ![CI](https://github.com/gloriadrm/kkbox-churn-prediction/actions/workflows/ci.yml/badge.svg)
-
-Predicción de abandono de clientes para un servicio de streaming musical por suscripción, desde los datos en bruto hasta un modelo versionado en MLflow y listo para servirse.
-
-**Experimentos y modelos:** [MLflow en DagsHub](https://dagshub.com/gloriadrm/kkbox-churn-prediction.mlflow)
-
-![CI](https://github.com/gloriadrm/kkbox-churn-prediction/actions/workflows/ci.yml/badge.svg)
 ![Python](https://img.shields.io/badge/python-3.13-blue)
 ![MLflow](https://img.shields.io/badge/MLflow-DagsHub-0194E2)
 ![FastAPI](https://img.shields.io/badge/FastAPI-API-009688)
 ![Docker](https://img.shields.io/badge/Docker-940%20MB-2496ED)
+
+Predicción de abandono de clientes para un servicio de streaming musical por suscripción, desde los datos en bruto hasta un modelo versionado en MLflow y listo para servirse.
+
+**Experimentos y modelos:** [MLflow en DagsHub](https://dagshub.com/gloriadrm/kkbox-churn-prediction.mlflow)
 
 ## El problema
 
@@ -38,7 +36,7 @@ Evaluados sobre un conjunto de validación que el modelo no ve ni para entrenar 
 
 **Prevención de *data leakage*.** Todas las variables se calculan solo con información anterior a una **fecha de corte** (1 de marzo de 2017), para que el modelo no use datos del futuro que no tendría en producción.
 
-**Feature engineering.** Unas 40 variables por cliente: recencia, antigüedad, días hasta la expiración, frecuencia y regularidad de pagos, tasas de cancelación y renovación automática, comportamiento del último día de transacciones, etc.
+**Feature engineering.** 38 variables por cliente: recencia, antigüedad, días hasta la expiración, frecuencia y regularidad de pagos, tasas de cancelación y renovación automática, comportamiento del último día de transacciones, etc.
 
 **Calidad de datos.** Edades fuera de rango convertidas en nulos con un indicador `age_unknown`, imputación con medianas aprendidas solo en train y validación automática de tipos y columnas.
 
@@ -65,13 +63,18 @@ flowchart LR
 ├── src/kkbox_churn/
 │   ├── config.py            # rutas, columnas, hiperparámetros y MLflow
 │   ├── cli.py               # comandos prepare / train / predict
+│   ├── logging_config.py    # logs en consola y archivo
 │   ├── data/                # carga de datos y construcción del dataset
 │   ├── features/            # feature engineering desde las tablas en bruto
 │   ├── preprocessing/       # calidad de datos y transformaciones (sklearn)
-│   └── models/              # entrenamiento, predicción, evaluación y tracking
+│   ├── models/              # entrenamiento, predicción, evaluación y tracking
+│   └── api/                 # API FastAPI y esquemas Pydantic
+├── tests/                   # tests con datos sintéticos y modelo simulado
 ├── notebooks/
 │   ├── dev/                 # exploración, EDA y experimentación
 │   └── pro/                 # flujo de producción paso a paso
+├── .github/workflows/ci.yml # tests y build de Docker en cada push
+├── Dockerfile
 └── pyproject.toml
 ```
 
@@ -102,6 +105,14 @@ uv run kkbox-churn predict    # predicción por lotes con el modelo champion
 ```
 
 `train --force-promote` promueve el nuevo modelo aunque no mejore al actual (por ejemplo, si cambian las features).
+
+## Tests
+
+```bash
+uv run pytest
+```
+
+17 tests que no necesitan los datos reales ni conexión a MLflow: se ejecutan sobre clientes sintéticos generados a partir de la configuración del proyecto, y la API se prueba con un modelo entrenado sobre esos datos. Cubren la limpieza e imputación (incluida la ausencia de *data leakage* en las medianas), el entrenamiento y la aplicación del umbral, la validación de entradas de la API y la gestión de errores del CLI. Se ejecutan automáticamente en cada push con GitHub Actions.
 
 ## API
 
@@ -144,11 +155,12 @@ La API queda disponible en `http://127.0.0.1:8000/docs`. Al arrancar, descarga d
 ```bash
 docker ps    # la columna STATUS muestra (healthy) cuando /health responde
 ```
+  
 La imagen ocupa unos 940 MB (frente a 3,5 GB en la primera versión): usa `mlflow-skinny` en lugar de MLflow completo, monta la caché de `uv` solo durante el build y ejecuta la API con un usuario sin privilegios.
 
 ## Stack
 
-Python · pandas · scikit-learn · MLflow · DagsHub · FastAPI · Pydantic · uv
+Python · pandas · scikit-learn · MLflow · DagsHub · FastAPI · Pydantic · Docker · pytest · GitHub Actions · uv
 
 ## Roadmap
 
@@ -159,4 +171,13 @@ Python · pandas · scikit-learn · MLflow · DagsHub · FastAPI · Pydantic · 
 - [x] Tracking de experimentos y Model Registry con MLflow (champion / challenger)
 - [x] API de predicción con FastAPI y Pydantic
 - [x] Docker
-- [ ] Tests con pytest e integración continua con GitHub Actions
+- [x] Tests con pytest e integración continua con GitHub Actions
+
+## Limitaciones y próximos pasos
+
+- **Validación en el mismo periodo.** Train y validación proceden de la misma fecha de corte. Una validación temporal (entrenar con un mes y evaluar con el siguiente) mediría mejor el rendimiento real en producción.
+- **Umbral basado en un supuesto de costes.** El criterio de Youden asume que contactar a un cliente es barato frente a perderlo. Con costes reales de retención, el umbral debería optimizar el beneficio esperado.
+- **Datos de actividad no utilizados.** El dataset incluye registros diarios de escucha (`user_logs`), que no se han incorporado por su tamaño y que probablemente aportarían señal sobre el compromiso del usuario.
+- **Edad desconocida en el 60 % de los clientes.** Se trata con imputación y un indicador, pero limita el valor de esta variable.
+- **Monitorización.** El siguiente paso sería detectar *data drift* en las features de entrada y lanzar el reentrenamiento automáticamente.
+- **Explicabilidad.** Añadir SHAP para justificar cada predicción ante el equipo de negocio.
