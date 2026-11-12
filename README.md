@@ -51,10 +51,15 @@ Evaluados sobre un conjunto de validación que el modelo no ve ni para entrenar 
 ```mermaid
 flowchart LR
     A[Datos en bruto<br/>Kaggle] -->|kkbox-churn prepare| B[Features por cliente<br/>train / validación]
-    B -->|kkbox-churn train| C[Pipeline<br/>limpieza + preprocesado + modelo + umbral]
-    C --> D[(MLflow<br/>DagsHub)]
-    D -->|alias champion| E[kkbox-churn predict<br/>predicción por lotes]
-    D -->|alias champion| F[API FastAPI<br/>predicción en tiempo real]
+    B -->|kkbox-churn train| C[Entrenamiento<br/>pipeline + umbral<br/>evaluación en validación]
+    C -->|nueva versión<br/>champion solo si mejora el AP| D[(MLflow Model Registry<br/>DagsHub)]
+    D -->|alias champion| E[kkbox-churn predict<br/>predicciones por lotes en CSV]
+
+    subgraph Docker
+        F[API FastAPI<br/>/predict · /predict/batch · /health]
+    end
+
+    D -->|alias champion<br/>al arrancar| F
 ```
 
 ## Estructura del proyecto
