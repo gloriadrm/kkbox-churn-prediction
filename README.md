@@ -53,14 +53,27 @@ flowchart LR
     A[Datos en bruto<br/>Kaggle] -->|kkbox-churn prepare| B[Features por cliente<br/>train / validación]
     B -->|kkbox-churn train| C[Entrenamiento<br/>pipeline + umbral<br/>evaluación en validación]
     C -->|nueva versión<br/>champion solo si mejora el AP| D[(MLflow Model Registry<br/>DagsHub)]
-    D -->|alias champion| E[kkbox-churn predict<br/>predicciones por lotes en CSV]
+    D -->|alias champion| E[Predicción por lotes<br/>kkbox-churn predict → CSV]
 
     subgraph Docker
-        F[API FastAPI<br/>/predict · /predict/batch · /health]
+        F[Predicción en tiempo real<br/>API FastAPI]
     end
 
     D -->|alias champion<br/>al arrancar| F
 ```
+
+**Entrenamiento.** `prepare` construye las features a partir de los datos en bruto y `train` entrena el modelo, lo evalúa y lo registra como una nueva versión en MLflow. Esa versión solo pasa a ser el modelo en producción (`champion`) si mejora al actual.
+
+**Uso del modelo.** El modelo `champion` se sirve de dos formas, según la necesidad:
+
+| | Predicción por lotes | Predicción en tiempo real |
+|---|---|---|
+| **Cómo** | `kkbox-churn predict` | API FastAPI en Docker |
+| **Entrada** | Un CSV con muchos clientes | Uno o varios clientes por petición |
+| **Salida** | Un CSV con las probabilidades | Una respuesta JSON inmediata |
+| **Caso de uso** | Lista mensual de clientes en riesgo para una campaña de retención | Mostrar una oferta cuando un cliente intenta cancelar su suscripción |
+
+Ambas usan siempre el modelo `champion`: cuando se promueve uno nuevo, el CLI lo usa en su siguiente ejecución y la API al reiniciarse.
 
 ## Estructura del proyecto
 
