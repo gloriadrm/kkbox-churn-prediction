@@ -1,0 +1,27 @@
+# Datos (se descargan de Kaggle)
+02_data/
+
+# Modelos y resultados generados
+04_models/
+05_results/
+*.pickle
+*.joblib
+mlflow.db
+mlruns/
+
+# Figuras exportadas de Plotly
+03_notebooks/dev/iframe_figures*/
+
+# Python
+__pycache__/
+*.pyc
+*.egg-info/
+.venv/
+.env
+
+# Jupyter
+.ipynb_checkpoints/
+
+# Sistema y Office
+.DS_Store
+~$*
