@@ -11,8 +11,8 @@ logger = logging.getLogger(__name__)
 
 def load_model():
     """Carga el modelo champion desde MLflow."""
-    model = load_champion()
-    logger.info("Modelo champion cargado (umbral %.4f)", model.best_threshold_)
+    model, version = load_champion()
+    logger.info("Modelo champion cargado (versión %s, umbral %.4f)", version, model.best_threshold_)
     return model
 
 

@@ -51,7 +51,7 @@ def train_model(df):
     return model
 
 
-def train_and_log(train_df, val_df):
+def train_and_log(train_df, val_df, force_promote=False):
     """
     Entrena, evalúa en validación y registra todo en MLflow.
     Devuelve el modelo, las métricas, la versión registrada y si se promovió a champion.
@@ -96,7 +96,7 @@ def train_and_log(train_df, val_df):
         )
 
         version = info.registered_model_version
-        promoted = promote_if_better(version, metrics[SELECTION_METRIC])
+        promoted = promote_if_better(version, metrics[SELECTION_METRIC], force=force_promote)
         mlflow.set_tag("promoted_to_champion", promoted)
 
     return model, metrics, version, promoted

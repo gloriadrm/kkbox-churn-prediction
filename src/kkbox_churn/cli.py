@@ -25,7 +25,7 @@ def cmd_train(args):
     val = load_dataset(args.validation)
     logger.info("Entrenando con %s filas, validando con %s...", f"{len(train):,}", f"{len(val):,}")
 
-    model, metrics, version, promoted = train_and_log(train, val)
+    model, metrics, version, promoted = train_and_log(train, val, force_promote=args.force_promote)
 
     logger.info("Versión %s registrada | umbral %.4f | val_roc_auc %.4f | champion: %s",
                 version, model.best_threshold_, metrics["roc_auc"], "sí" if promoted else "no")
@@ -64,6 +64,8 @@ def build_parser():
     t = sub.add_parser("train", help="Entrena el modelo y lo guarda")
     t.add_argument("--input", type=Path, default=TRAIN_PATH)
     t.add_argument("--validation", type=Path, default=VALIDATION_PATH)
+    t.add_argument("--force-promote", action="store_true",
+               help="Promueve a champion aunque no mejore la métrica (p. ej. si cambian las features)")
     t.set_defaults(func=cmd_train)
 
     pr = sub.add_parser("predict", help="Genera predicciones (y métricas si hay target)")

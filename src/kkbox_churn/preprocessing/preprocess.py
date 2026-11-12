@@ -3,7 +3,7 @@ from sklearn.base import BaseEstimator, TransformerMixin
 
 
 from kkbox_churn.config import (
-                        ID_COL, TARGET, DATETIME_COLS, NOMINAL_NUM_COLS,
+                        ID_COL, TARGET, NOMINAL_NUM_COLS,
                         NOMINAL_STR_COLS, INT_COLS, FLOAT_COLS,
                         BINARY_COLS, ZERO_COLS, MEDIAN_COLS, 
                         AGE_MIN, AGE_MAX )
@@ -17,7 +17,7 @@ def cast_types(df):
     df = df.copy()
 
     # Comprobaciones previas
-    all_cols = (DATETIME_COLS + NOMINAL_NUM_COLS + NOMINAL_STR_COLS
+    all_cols = ( NOMINAL_NUM_COLS + NOMINAL_STR_COLS
                 + INT_COLS + FLOAT_COLS)
 
     duplicated = {c for c in all_cols if all_cols.count(c) > 1}
@@ -33,7 +33,6 @@ def cast_types(df):
         raise ValueError(f"Columnas sin tipar: {remaining}")
 
     # Conversión de tipos
-    df[DATETIME_COLS] = df[DATETIME_COLS].apply(pd.to_datetime)
     df[NOMINAL_NUM_COLS] = df[NOMINAL_NUM_COLS].astype("Int32").astype("string")
     df[NOMINAL_STR_COLS] = df[NOMINAL_STR_COLS].astype("string")
     df[INT_COLS] = df[INT_COLS].astype("Int32")

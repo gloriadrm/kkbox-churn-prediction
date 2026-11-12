@@ -44,16 +44,17 @@ def get_champion_score(client):
     return client.get_run(version.run_id).data.metrics.get(f"val_{SELECTION_METRIC}")
 
 
-def promote_if_better(version, score):
-    """Asigna el alias champion a la nueva versión si mejora al champion actual."""
+def promote_if_better(version, score, force=False):
+    """Asigna el alias champion a la nueva versión si mejora al champion actual (o si se fuerza)."""
     client = MlflowClient()
     current = get_champion_score(client)
 
-    if current is None or score > current:
+    if force or current is None or score > current:
         client.set_registered_model_alias(MLFLOW_MODEL_NAME, MLFLOW_CHAMPION_ALIAS, version)
-        logger.info("Versión %s promovida a champion (%s %.4f, anterior %s)",
+        logger.info("Versión %s promovida a champion (%s %.4f, anterior %s%s)",
                     version, SELECTION_METRIC, score,
-                    "ninguno" if current is None else f"{current:.4f}")
+                    "ninguno" if current is None else f"{current:.4f}",
+                    ", promoción forzada" if force else "")
         return True
 
     logger.info("Versión %s no promovida: %s %.4f no mejora al champion (%.4f)",
@@ -62,13 +63,18 @@ def promote_if_better(version, score):
 
 
 def load_champion():
-    """Carga el modelo con alias champion desde el Model Registry."""
+    """Carga el modelo champion desde el Model Registry. Devuelve (modelo, versión)."""
     mlflow.set_tracking_uri(MLFLOW_TRACKING_URI)
-    uri = f"models:/{MLFLOW_MODEL_NAME}@{MLFLOW_CHAMPION_ALIAS}"
+    client = MlflowClient()
+
     try:
-        return mlflow.sklearn.load_model(uri)
+        version = client.get_model_version_by_alias(MLFLOW_MODEL_NAME, MLFLOW_CHAMPION_ALIAS)
     except MlflowException as e:
         raise LookupError(
             f"No hay ningún modelo con alias '{MLFLOW_CHAMPION_ALIAS}'. "
             "Ejecuta antes 'kkbox-churn train'."
         ) from e
+
+    # Se carga por número de versión: así modelo y versión siempre coinciden
+    model = mlflow.sklearn.load_model(f"models:/{MLFLOW_MODEL_NAME}/{version.version}")
+    return model, version.version

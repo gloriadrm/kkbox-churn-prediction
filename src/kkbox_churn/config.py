@@ -59,14 +59,14 @@ ID_COL = "msno"
 TARGET = "is_churn"
 
 
-# 1. VARIABLES DE TIPO FECHA
-DATETIME_COLS = [
-    "registration_init_time",
-    "first_transaction",
-    "last_transaction",
-    "max_expire_date",
-    "last_day_max_expire"
-]
+# 1. VARIABLES DE TIPO FECHA (NO LAS USAMOS DIRECTAMENTE, PERO SÍ PARA CALCULAR FEATURES)
+# DATETIME_COLS = [
+#     "registration_init_time",
+#     "first_transaction",
+#     "last_transaction",
+#     "max_expire_date",
+#     "last_day_max_expire"
+# ]
 
 
 # 2. VARIABLES CATEGÓRICAS NOMINALES
@@ -199,19 +199,19 @@ RS_QUANTILE_RANGE = (10.0, 90.0)
 # ============================================================
 
 SELECTED_FEATURES = ['city', 'age', 'gender', 'registered_via',
-       'registration_init_time', 'membership_age_days',
-       'n_transaction_records', 'n_transaction_days', 'first_transaction',
-       'last_transaction', 'n_cancellations', 'cancel_rate',
+       'membership_age_days',
+       'n_transaction_records', 'n_transaction_days', 
+       'n_cancellations', 'cancel_rate',
        'n_non_cancelled_transactions', 'avg_amount_paid', 'total_amount_paid',
        'payment_amount_std', 'total_non_cancelled_amount',
        'avg_payment_per_30d', 'avg_plan_days', 'max_plan_days',
        'n_distinct_plan_days', 'n_payment_methods',
-       'n_zero_list_price_transactions', 'auto_renew_rate', 'max_expire_date',
+       'n_zero_list_price_transactions', 'auto_renew_rate', 
        'max_transactions_same_day', 'avg_transactions_per_day',
        'n_multi_transaction_days', 'has_multi_non_cancelled_day',
        'has_mixed_cancel_day', 'last_day_n_transactions',
        'last_day_any_cancel', 'last_day_any_auto_renew',
-       'last_day_all_auto_renew', 'last_day_max_expire',
+       'last_day_all_auto_renew', 
        'last_day_max_payment', 'recency_days', 'transaction_span_days',
        'days_to_max_expiry', 'days_to_expiry', 'has_multi_transaction_day',
        'multi_transaction_day_rate', 'extra_transaction_records']
@@ -231,3 +231,9 @@ MODEL_PARAMS = {
     "l2_regularization": 0,
     "random_state": 42,
 }
+# ============================================================
+# API
+# ============================================================
+
+# Se registra un WARNING si a un cliente le falta más de esta proporción de features
+MAX_MISSING_FEATURES_RATIO = 0.5
