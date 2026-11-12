@@ -82,7 +82,8 @@ def clean_data(df, medians):
     # Comprobación final
     imputed_cols = nominal_cols + BINARY_COLS + ZERO_COLS + MEDIAN_COLS
     remaining_na = temp[imputed_cols].isna().sum()
-    assert remaining_na.sum() == 0, f"Quedan NaN: {remaining_na[remaining_na > 0].to_dict()}"
+    if remaining_na.sum() > 0:
+        raise ValueError(f"Quedan NaN tras imputar: {remaining_na[remaining_na > 0].to_dict()}")
 
     return temp
 

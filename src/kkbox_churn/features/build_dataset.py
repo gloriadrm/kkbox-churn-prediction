@@ -1,5 +1,4 @@
 import pandas as pd
-import numpy as np
 from kkbox_churn.features.members import build_member_features
 from kkbox_churn.features.transactions import build_transaction_features
 
@@ -9,7 +8,8 @@ def integrate_transactions(tx1, tx2):
     Aún no filtramos por ninguna fecha solo unimos dataframes transaccionales.
     """
     # Comprobamos que ambos datasets tengan mismas columnas 
-    assert set(tx1.columns) == set(tx2.columns), "Las columnas de los dfs no coinciden."
+    if set(tx1.columns) != set(tx2.columns):
+        raise ValueError("Las columnas de transactions y transactions_v2 no coinciden.")
 
     # Eliminamos dupliados 
     tx1 = tx1.drop_duplicates()
@@ -50,7 +50,9 @@ def build_features(clients, members, transactions, cutoff):
         )
     )
 
-    assert len(df) == len(clients)
-    assert df["msno"].is_unique
+    if len(df) != len(clients):
+        raise ValueError(f"El dataset tiene {len(df)} filas y debería tener {len(clients)} (una por cliente).")
+    if not df["msno"].is_unique:
+        raise ValueError("Hay clientes duplicados en el dataset.")
 
     return df

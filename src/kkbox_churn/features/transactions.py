@@ -212,9 +212,9 @@ def build_transaction_features(transactions, clients, cutoff):
     
     # Comprobación: no se incorporan transacciones de marzo
     if tx["transaction_date"].max() >= cutoff:
-    raise ValueError(
-        "Hay transacciones posteriores a la fecha de corte: riesgo de data leakage."
-    )
+        raise ValueError(
+            "Hay transacciones posteriores a la fecha de corte: riesgo de data leakage."
+        )
     
     logger.info("Features de transacciones: %s clientes, %s columnas", *client_txs.shape)
 
