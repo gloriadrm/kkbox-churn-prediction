@@ -48,7 +48,7 @@ flowchart LR
     B -->|kkbox-churn train| C[Pipeline<br/>limpieza + preprocesado + modelo + umbral]
     C --> D[(MLflow<br/>DagsHub)]
     D -->|alias champion| E[kkbox-churn predict<br/>predicción por lotes]
-    D -->|alias champion| F[API FastAPI<br/>próximamente]
+    D -->|alias champion| F[API FastAPI<br/>predicción en tiempo real]
 ```
 
 ## Estructura del proyecto
@@ -85,17 +85,35 @@ MLFLOW_TRACKING_USERNAME=<usuario>
 MLFLOW_TRACKING_PASSWORD=<token>
 ```
 
-**4. Ejecutar**
+**4. Pipeline**
 
 ```bash
 uv run kkbox-churn prepare    # construye las features y separa train / validación
 uv run kkbox-churn train      # entrena, evalúa y registra el modelo en MLflow
-uv run kkbox-churn predict    # genera predicciones con el modelo champion
+uv run kkbox-churn predict    # predicción por lotes con el modelo champion
 ```
+
+`train --force-promote` promueve el nuevo modelo aunque no mejore al actual (por ejemplo, si cambian las features).
+
+## API
+
+```bash
+uv run uvicorn kkbox_churn.api.main:app
+```
+
+Documentación interactiva en `http://127.0.0.1:8000/docs`.
+
+| Endpoint | Descripción |
+|---|---|
+| `GET /health` | Estado de la API, versión y umbral del modelo cargado |
+| `POST /predict` | Probabilidad y clase de churn de un cliente |
+| `POST /predict/batch` | Lo mismo para hasta 1.000 clientes |
+
+Las entradas se validan con Pydantic (tipos, rangos y campos desconocidos). Los valores ausentes se imputan igual que en el entrenamiento, y se registra un aviso si a un cliente le falta más de la mitad de las features.
 
 ## Stack
 
-Python · pandas · scikit-learn · MLflow · DagsHub
+Python · pandas · scikit-learn · MLflow · DagsHub · FastAPI · Pydantic · uv
 
 ## Roadmap
 
@@ -104,6 +122,6 @@ Python · pandas · scikit-learn · MLflow · DagsHub
 - [x] Ajuste del umbral de decisión
 - [x] Paquete Python reproducible con CLI, logging y control de errores
 - [x] Tracking de experimentos y Model Registry con MLflow (champion / challenger)
-- [ ] API de predicción con FastAPI y Pydantic
+- [x] API de predicción con FastAPI y Pydantic
 - [ ] Docker
 - [ ] Tests con pytest e integración continua con GitHub Actions

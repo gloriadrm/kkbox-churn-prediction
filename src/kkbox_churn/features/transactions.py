@@ -207,9 +207,14 @@ def build_transaction_features(transactions, clients, cutoff):
     client_txs = client_txs.reset_index()
     
     # Comprobación: una única fila por cliente
-    assert client_txs["msno"].is_unique
+    if not client_txs["msno"].is_unique:
+        raise ValueError("Hay clientes duplicados.")
+    
     # Comprobación: no se incorporan transacciones de marzo
-    assert tx["transaction_date"].max() < cutoff
+    if tx["transaction_date"].max() >= cutoff:
+    raise ValueError(
+        "Hay transacciones posteriores a la fecha de corte: riesgo de data leakage."
+    )
     
     logger.info("Features de transacciones: %s clientes, %s columnas", *client_txs.shape)
 
