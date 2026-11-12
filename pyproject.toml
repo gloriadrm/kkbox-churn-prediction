@@ -13,7 +13,8 @@ dependencies = [
     "numpy>=2.0",
     "scikit-learn>=1.7,<1.8",
     "joblib>=1.5",
-    "mlflow>=3.0",
+    "mlflow-skinny>=3.0",   # en lugar de "mlflow>=3.0"
+    "skops",                # para cargar los modelos guardados en formato skops (necesario para mlflow)
     "python-dotenv>=1.0",
     "fastapi>=0.162.5",
     "uvicorn[standard]>=0.54.0",
@@ -26,6 +27,7 @@ dev = [
     "matplotlib",
     "plotly",
     "pytest>=9.2.0",
+    "mlflow>=3.0",
 ]
 
 [tool.setuptools.packages.find]

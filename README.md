@@ -111,6 +111,33 @@ Documentación interactiva en `http://127.0.0.1:8000/docs`.
 
 Las entradas se validan con Pydantic (tipos, rangos y campos desconocidos). Los valores ausentes se imputan igual que en el entrenamiento, y se registra un aviso si a un cliente le falta más de la mitad de las features.
 
+## Docker
+
+**Construir la imagen**
+
+```bash
+docker build -t kkbox-churn-api .
+```
+
+**Ejecutar el contenedor**
+
+```bash
+docker run --rm -p 8000:8000 --env-file .env kkbox-churn-api
+```
+
+- `-p 8000:8000`: conecta el puerto 8000 de la máquina con el del contenedor.
+- `--env-file .env`: pasa las credenciales de MLflow como variables de entorno. Nunca se incluyen en la imagen.
+- `--rm`: elimina el contenedor al pararlo.
+
+La API queda disponible en `http://127.0.0.1:8000/docs`. Al arrancar, descarga de MLflow el modelo con alias `champion`, así que para servir un modelo recién promovido basta con reiniciar el contenedor, sin reconstruir la imagen.
+
+**Comprobar el estado**
+
+```bash
+docker ps    # la columna STATUS muestra (healthy) cuando /health responde
+```
+La imagen ocupa unos 940 MB (frente a 3,5 GB en la primera versión): usa `mlflow-skinny` en lugar de MLflow completo, monta la caché de `uv` solo durante el build y ejecuta la API con un usuario sin privilegios.
+
 ## Stack
 
 Python · pandas · scikit-learn · MLflow · DagsHub · FastAPI · Pydantic · uv
@@ -123,5 +150,5 @@ Python · pandas · scikit-learn · MLflow · DagsHub · FastAPI · Pydantic · 
 - [x] Paquete Python reproducible con CLI, logging y control de errores
 - [x] Tracking de experimentos y Model Registry con MLflow (champion / challenger)
 - [x] API de predicción con FastAPI y Pydantic
-- [ ] Docker
+- [x] Docker
 - [ ] Tests con pytest e integración continua con GitHub Actions

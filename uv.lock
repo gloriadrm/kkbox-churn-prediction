@@ -2111,12 +2111,13 @@ source = { editable = "." }
 dependencies = [
     { name = "fastapi" },
     { name = "joblib" },
-    { name = "mlflow" },
+    { name = "mlflow-skinny" },
     { name = "numpy", version = "2.4.6", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.12'" },
     { name = "numpy", version = "2.5.4", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.12'" },
     { name = "pandas" },
     { name = "python-dotenv" },
     { name = "scikit-learn" },
+    { name = "skops" },
     { name = "uvicorn", extra = ["standard"] },
 ]
 
@@ -2125,6 +2126,7 @@ dev = [
     { name = "httpx2" },
     { name = "jupyter" },
     { name = "matplotlib" },
+    { name = "mlflow" },
     { name = "plotly" },
     { name = "pytest" },
 ]
@@ -2136,13 +2138,15 @@ requires-dist = [
     { name = "joblib", specifier = ">=1.5" },
     { name = "jupyter", marker = "extra == 'dev'" },
     { name = "matplotlib", marker = "extra == 'dev'" },
-    { name = "mlflow", specifier = ">=3.0" },
+    { name = "mlflow", marker = "extra == 'dev'", specifier = ">=3.0" },
+    { name = "mlflow-skinny", specifier = ">=3.0" },
     { name = "numpy", specifier = ">=2.0" },
     { name = "pandas", specifier = ">=3.0" },
     { name = "plotly", marker = "extra == 'dev'" },
     { name = "pytest", marker = "extra == 'dev'", specifier = ">=9.2.0" },
     { name = "python-dotenv", specifier = ">=1.0" },
     { name = "scikit-learn", specifier = ">=1.7,<1.8" },
+    { name = "skops" },
     { name = "uvicorn", extras = ["standard"], specifier = ">=0.54.0" },
 ]
 provides-extras = ["dev"]

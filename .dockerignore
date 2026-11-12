@@ -1,0 +1,14 @@
+.git
+.venv
+.env
+data
+models
+results
+logs
+notebooks
+tests
+mlflow.db
+mlartifacts
+**/__pycache__
+*.pyc
+.DS_Store
