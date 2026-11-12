@@ -9,6 +9,8 @@
 *.joblib
 mlflow.db
 mlruns/
+/mlflow.db
+/mlartifacts/
 
 # Figuras exportadas de Plotly
 notebooks/dev/iframe_figures*/

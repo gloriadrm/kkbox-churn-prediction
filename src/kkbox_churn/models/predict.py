@@ -1,18 +1,18 @@
 import logging
-import joblib
 import pandas as pd
 
-from kkbox_churn.config import ID_COL, MODEL_PATH, SELECTED_FEATURES
+from kkbox_churn.config import ID_COL, SELECTED_FEATURES
+from kkbox_churn.models.tracking import load_champion
+
+logger = logging.getLogger(__name__)
 
 logger = logging.getLogger(__name__)
 
 
-def load_model(path=MODEL_PATH):
-    """Carga el modelo entrenado (pipeline + umbral)."""
-    if not path.exists():
-        raise FileNotFoundError(f"No existe el modelo {path}. Ejecuta antes 'kkbox-churn train'.")
-    model = joblib.load(path)
-    logger.info("Modelo cargado (umbral %.4f)", model.best_threshold_)
+def load_model():
+    """Carga el modelo champion desde MLflow."""
+    model = load_champion()
+    logger.info("Modelo champion cargado (umbral %.4f)", model.best_threshold_)
     return model
 
 

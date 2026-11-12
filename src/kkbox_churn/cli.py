@@ -19,13 +19,16 @@ def cmd_prepare(args):
 
 def cmd_train(args):
     from kkbox_churn.data.load import load_dataset
-    from kkbox_churn.models.train import train_model, save_model
+    from kkbox_churn.models.train import train_and_log
 
     train = load_dataset(args.input)
-    logger.info("Entrenando con %s filas...", f"{len(train):,}")
-    model = train_model(train)
-    path = save_model(model)
-    logger.info("Modelo guardado en %s (umbral %.4f)", path, model.best_threshold_)
+    val = load_dataset(args.validation)
+    logger.info("Entrenando con %s filas, validando con %s...", f"{len(train):,}", f"{len(val):,}")
+
+    model, metrics, version, promoted = train_and_log(train, val)
+
+    logger.info("Versión %s registrada | umbral %.4f | val_roc_auc %.4f | champion: %s",
+                version, model.best_threshold_, metrics["roc_auc"], "sí" if promoted else "no")
 
 
 def cmd_predict(args):
@@ -60,6 +63,7 @@ def build_parser():
 
     t = sub.add_parser("train", help="Entrena el modelo y lo guarda")
     t.add_argument("--input", type=Path, default=TRAIN_PATH)
+    t.add_argument("--validation", type=Path, default=VALIDATION_PATH)
     t.set_defaults(func=cmd_train)
 
     pr = sub.add_parser("predict", help="Genera predicciones (y métricas si hay target)")
@@ -78,7 +82,7 @@ def main(argv=None):
         logger.info("Inicio: %s", args.command)
         args.func(args)
         logger.info("Fin: %s", args.command)
-    except (FileNotFoundError, ValueError) as e:
+    except (FileNotFoundError, ValueError, LookupError) as e:
         logger.error(str(e))          # error esperado: mensaje claro, sin traceback
         sys.exit(1)
     except Exception:

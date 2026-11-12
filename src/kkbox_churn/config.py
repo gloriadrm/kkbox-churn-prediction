@@ -1,5 +1,8 @@
 from pathlib import Path
+import os
+from dotenv import load_dotenv
 
+load_dotenv()   # lee el .env de la raíz del proyecto, si existe
 
 # ============================================================
 #  PATHS
@@ -11,7 +14,6 @@ RAW_DATA_DIR = PROJECT_ROOT / "data" / "raw"
 PROCESSED_DATA_DIR = PROJECT_ROOT / "data" / "processed"
 
 MODELS_DIR = PROJECT_ROOT / "models"
-MODEL_PATH = MODELS_DIR / "execution_pipeline.joblib"
 
 TRAIN_PATH = PROJECT_ROOT / "data" / "train" / "train.csv"
 VALIDATION_PATH = PROJECT_ROOT / "data" / "validation" / "validation.csv"
@@ -31,6 +33,22 @@ RAW_FILES = {
 CUTOFF = "2017-03-01"
 TEST_SIZE = 0.3
 RANDOM_STATE = 42
+
+# ============================================================
+# MLFLOW
+# ============================================================
+
+# Se puede sobrescribir con una variable de entorno (útil en Docker)
+MLFLOW_TRACKING_URI = os.getenv("MLFLOW_TRACKING_URI", f"sqlite:///{PROJECT_ROOT / 'mlflow.db'}")
+MLFLOW_ARTIFACT_DIR = PROJECT_ROOT / "mlartifacts"
+
+MLFLOW_EXPERIMENT = "kkbox-churn"
+MLFLOW_MODEL_NAME = "kkbox-churn-classifier"
+MLFLOW_CHAMPION_ALIAS = "champion"
+
+# Métrica de validación que decide si un modelo nuevo sustituye al champion
+SELECTION_METRIC = "average_precision"
+THRESHOLD_CV = 3
 
 # ============================================================
 #  TYPES 
