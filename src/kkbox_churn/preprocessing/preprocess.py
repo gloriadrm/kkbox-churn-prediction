@@ -1,27 +1,12 @@
-import numpy as np
 import pandas as pd
-import cloudpickle
-from pathlib import Path
-
-from sklearn.preprocessing import OneHotEncoder, RobustScaler
-from sklearn.ensemble import HistGradientBoostingClassifier
-
-from sklearn.pipeline import Pipeline
-from sklearn.preprocessing import FunctionTransformer
-from sklearn.compose import make_column_transformer
-from sklearn.pipeline import make_pipeline
-
 from sklearn.base import BaseEstimator, TransformerMixin
-from sklearn.compose import ColumnTransformer
-from sklearn.preprocessing import OneHotEncoder, RobustScaler
 
-from kkbox_churn.config import (PROJECT_ROOT, 
+
+from kkbox_churn.config import (
                         ID_COL, TARGET, DATETIME_COLS, NOMINAL_NUM_COLS,
                         NOMINAL_STR_COLS, INT_COLS, FLOAT_COLS,
                         BINARY_COLS, ZERO_COLS, MEDIAN_COLS, 
-                        AGE_MIN, AGE_MAX, 
-                        SELECTED_FEATURES, 
-                        OHE_COLS, PASSTHROUGH_COLS, RS_COLS, RS_QUANTILE_RANGE )
+                        AGE_MIN, AGE_MAX )
 
 ### Instantiate data cleaning function
 def cast_types(df):
@@ -36,13 +21,16 @@ def cast_types(df):
                 + INT_COLS + FLOAT_COLS)
 
     duplicated = {c for c in all_cols if all_cols.count(c) > 1}
-    assert not duplicated, f"Columnas en más de un grupo: {duplicated}"
+    if duplicated:
+        raise ValueError(f"Columnas en más de un grupo: {duplicated}")
 
     missing = set(all_cols) - set(df.columns)
-    assert not missing, f"Columnas que no existen en el df: {missing}"
+    if missing:
+        raise ValueError(f"Columnas que no existen en el df: {missing}")
 
     remaining = set(df.columns) - set(all_cols) - {ID_COL, TARGET}
-    assert not remaining, f"Columnas sin tipar: {remaining}"
+    if remaining:
+        raise ValueError(f"Columnas sin tipar: {remaining}")
 
     # Conversión de tipos
     df[DATETIME_COLS] = df[DATETIME_COLS].apply(pd.to_datetime)

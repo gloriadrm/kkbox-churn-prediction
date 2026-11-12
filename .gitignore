@@ -1,16 +1,17 @@
 # Datos (se descargan de Kaggle)
-02_data/
+/data/
 
 # Modelos y resultados generados
-04_models/
-05_results/
+/models/
+/results/
+/logs/
 *.pickle
 *.joblib
 mlflow.db
 mlruns/
 
 # Figuras exportadas de Plotly
-03_notebooks/dev/iframe_figures*/
+notebooks/dev/iframe_figures*/
 
 # Python
 __pycache__/

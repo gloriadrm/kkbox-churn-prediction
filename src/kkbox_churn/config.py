@@ -7,14 +7,18 @@ from pathlib import Path
 # config.py está en client_churn/src/kkbox_churn/
 PROJECT_ROOT = Path(__file__).resolve().parents[2]
 
-RAW_DATA_DIR = PROJECT_ROOT / "02_data" / "raw"
-PROCESSED_DATA_DIR = PROJECT_ROOT / "02_data" / "processed"
+RAW_DATA_DIR = PROJECT_ROOT / "data" / "raw"
+PROCESSED_DATA_DIR = PROJECT_ROOT / "data" / "processed"
 
-MODELS_DIR = PROJECT_ROOT / "04_models"
+MODELS_DIR = PROJECT_ROOT / "models"
 MODEL_PATH = MODELS_DIR / "execution_pipeline.joblib"
 
-TRAIN_PATH = PROJECT_ROOT / "02_data" / "train" / "train.csv"
-VALIDATION_PATH = PROJECT_ROOT / "02_data" / "validation" / "validation.csv"
+TRAIN_PATH = PROJECT_ROOT / "data" / "train" / "train.csv"
+VALIDATION_PATH = PROJECT_ROOT / "data" / "validation" / "validation.csv"
+
+
+LOGS_DIR = PROJECT_ROOT / "logs"
+PREDICTIONS_PATH = PROJECT_ROOT / "results" / "predictions.csv"
 
 RAW_FILES = {
     "clients": "train_v2.csv",

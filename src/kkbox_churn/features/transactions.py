@@ -1,6 +1,9 @@
 
 import numpy as np
 import pandas as pd
+import logging
+
+logger = logging.getLogger(__name__)
  
 def build_transaction_features(transactions, clients, cutoff):
     """
@@ -208,6 +211,6 @@ def build_transaction_features(transactions, clients, cutoff):
     # Comprobación: no se incorporan transacciones de marzo
     assert tx["transaction_date"].max() < cutoff
     
-    print(f"Tamaño del dataset: {client_txs.shape}")
+    logger.info("Features de transacciones: %s clientes, %s columnas", *client_txs.shape)
 
     return client_txs

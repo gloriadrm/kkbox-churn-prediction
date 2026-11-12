@@ -6,10 +6,10 @@ Predicción de abandono de clientes de un servicio de streaming musical (dataset
 
 ## Estructura
 - `src/kkbox_churn/`: paquete con la lógica (datos, features, preprocesado, modelo)
-- `03_notebooks/dev/`: exploración y experimentación
-- `03_notebooks/pro/`: flujo de producción (prepare → train → predict)
+- `notebooks/dev/`: exploración y experimentación
+- `notebooks/pro/`: flujo de producción (prepare → train → predict)
 
 ## Reproducir
 1. Descargar los datos de [Kaggle](https://www.kaggle.com/c/kkbox-churn-prediction-challenge/data) en `02_data/raw/`
 2. `pip install -e .`
-3. Ejecutar los notebooks de `03_notebooks/pro/` en orden
+3. Ejecutar los notebooks de `notebooks/pro/` en orden
