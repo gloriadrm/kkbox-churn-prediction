@@ -1,8 +1,16 @@
 # KKBox Churn Prediction
 
+![CI](https://github.com/gloriadrm/kkbox-churn-prediction/actions/workflows/ci.yml/badge.svg)
+
 Predicción de abandono de clientes para un servicio de streaming musical por suscripción, desde los datos en bruto hasta un modelo versionado en MLflow y listo para servirse.
 
 **Experimentos y modelos:** [MLflow en DagsHub](https://dagshub.com/gloriadrm/kkbox-churn-prediction.mlflow)
+
+![CI](https://github.com/gloriadrm/kkbox-churn-prediction/actions/workflows/ci.yml/badge.svg)
+![Python](https://img.shields.io/badge/python-3.13-blue)
+![MLflow](https://img.shields.io/badge/MLflow-DagsHub-0194E2)
+![FastAPI](https://img.shields.io/badge/FastAPI-API-009688)
+![Docker](https://img.shields.io/badge/Docker-940%20MB-2496ED)
 
 ## El problema
 
